@@ -31,6 +31,7 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
     $kimaiProjects = CRM_Exthours_Kimai_Utils::getKimaiProjects();
     foreach ($kimaiProjects['items'] as $kimaiProject) {
       $isUsed = \Civi\Api4\ProjectContact::get()
+        ->setCheckPermissions(FALSE)
         ->addWhere('external_id', '=', $kimaiProject['projectID'])
         ->execute()
         ->count();
@@ -99,8 +100,10 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
     $values = $this->exportValues();
 
     $getProjectId = \Civi\Api4\ProjectContact::get()
+      ->setCheckPermissions(FALSE)
       ->addWhere('external_id', '=', $values['kimai_project_id']);
     $getOrganizationId = \Civi\Api4\ProjectContact::get()
+      ->setCheckPermissions(FALSE)
       ->addWhere('contact_id', '=', $values['civicrm_organization_id']);
 
     // If edit/update, exclude current ID
@@ -131,6 +134,7 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
 
     if ($this->_id) {
       $results = \Civi\Api4\ProjectContact::update()
+        ->setCheckPermissions(FALSE)
         ->addWhere('id', '=', $this->_id)
         ->addValue('external_id', $values['kimai_project_id'])
         ->addValue('contact_id', $values['civicrm_organization_id'])
@@ -140,6 +144,7 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
     }
     else {
       $results = \Civi\Api4\ProjectContact::create()
+        ->setCheckPermissions(FALSE)
         ->addValue('external_id', $values['kimai_project_id'])
         ->addValue('contact_id', $values['civicrm_organization_id'])
         ->execute();

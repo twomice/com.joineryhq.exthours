@@ -331,6 +331,13 @@ class CRM_Exthours_Kimai_Utils {
       ->execute()
       ->first();
 
+    // Get column name of is invoiced custom field
+    $isInvoiced = \Civi\Api4\CustomField::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('label', '=', 'Is Invoiced?')
+      ->execute()
+      ->first();
+
     // Insert/Update work category
     $createWorkCategory = civicrm_api3('CustomValue', 'create', [
       'sequential' => 1,
@@ -339,8 +346,16 @@ class CRM_Exthours_Kimai_Utils {
       "custom_{$workCategory['id']}" => $customFields['work_category'],
     ]);
 
-    // Add empty space string if trackingNumberVal is empty
-    $trackingNumberVal = !empty($customFields['tracking_number']) ? $customFields['tracking_number'] : NULL;
+    // Init trackingNumberValue and IsInvoicedValue
+    $trackingNumberVal = NULL;
+    $isInvoicedVal = 0;
+
+    // If customFields['tracking_number'] is not empty, update...
+    // trackingNumberValue and IsInvoicedValue value
+    if (!empty($customFields['tracking_number'])) {
+      $trackingNumberVal = $customFields['tracking_number'];
+      $isInvoicedVal = 1;
+    }
 
     // Insert/Update tracking number
     $createTrackingNumber = civicrm_api3('CustomValue', 'create', [
@@ -348,6 +363,14 @@ class CRM_Exthours_Kimai_Utils {
       'entity_id' => $entityId,
       'entity_type' => 'Activity',
       "custom_{$trackingNumber['id']}" => $trackingNumberVal,
+    ]);
+
+    // Insert/Update isInvoiced
+    $createIsInvoiced = civicrm_api3('CustomValue', 'create', [
+      'sequential' => 1,
+      'entity_id' => $entityId,
+      'entity_type' => 'Activity',
+      "custom_{$isInvoiced['id']}" => $isInvoicedVal,
     ]);
   }
 

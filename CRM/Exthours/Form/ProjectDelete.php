@@ -31,6 +31,7 @@ class CRM_Exthours_Form_ProjectDelete extends CRM_Core_Form {
     );
 
     $results = \Civi\Api4\ProjectContact::delete()
+      ->setCheckPermissions(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
