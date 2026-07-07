@@ -13,13 +13,13 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
    * System ID for Project Contact being edited.
    * @var int
    */
-  private $_id;
+  private $_projectId;
 
   /**
    * Pre-process
    */
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
+    $this->_projectId = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
   }
@@ -79,9 +79,9 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    if ($this->_id) {
+    if ($this->_projectId) {
       $projectContact = \Civi\Api4\ProjectContact::get()
-        ->addWhere('id', '=', $this->_id)
+        ->addWhere('id', '=', $this->_projectId)
         ->execute()
         ->first();
       $defaults['kimai_project_id'] = $projectContact['external_id'];
@@ -104,9 +104,9 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
       ->addWhere('contact_id', '=', $values['civicrm_organization_id']);
 
     // If edit/update, exclude current ID
-    if ($this->_id) {
-      $getProjectId->addWhere('id', '!=', $this->_id);
-      $getOrganizationId->addWhere('id', '!=', $this->_id);
+    if ($this->_projectId) {
+      $getProjectId->addWhere('id', '!=', $this->_projectId);
+      $getOrganizationId->addWhere('id', '!=', $this->_projectId);
     }
 
     $checkProjectId = $getProjectId->execute()->first();
@@ -129,9 +129,9 @@ class CRM_Exthours_Form_Project extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
 
-    if ($this->_id) {
+    if ($this->_projectId) {
       $results = \Civi\Api4\ProjectContact::update()
-        ->addWhere('id', '=', $this->_id)
+        ->addWhere('id', '=', $this->_projectId)
         ->addValue('external_id', $values['kimai_project_id'])
         ->addValue('contact_id', $values['civicrm_organization_id'])
         ->execute();
